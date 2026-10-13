@@ -14,6 +14,30 @@ app.get('/api/application', async(req,res) =>{
     })
     res.json(applications);
 })
+app.get('/api/application/:id',async (req,res)=>{
+    try{
+    const id = Number(req.params.id);
+    if(!Number.isInteger(id)|| id<=0){
+       return res.status(400).json({error: "Application id is invalid"});
+    }
+    
+    const oneApplication = await prisma.application.findUnique(
+        {
+            where:{id}
+        }
+    )
+    if(!oneApplication){
+      return  res.status(404).json({error : "Application not found"});
+    }
+    return res.json(oneApplication);
+}catch(error){
+    console.error("Error while fetching Application",error);
+    return res.status(500).json({error:"Something went wrong while fetching Application"});
+
+
+}
+})
+
 app.post('/api/application', async (req, res) => {
     const newApplication = await prisma.application.create({
         data: {
@@ -29,10 +53,11 @@ app.post('/api/application', async (req, res) => {
 
 app.patch('/api/application/:id', async (req, res) => {
     const id = Number(req.params.id);
+    const notes = req.body.notes;
     const status = req.body.status;
     const updatedApplication = await prisma.application.update({
-        where:{id:id},
-        data:{status:status}
+        where:{id},
+        data:{status, notes}
     })
     res.json(updatedApplication);
 });
