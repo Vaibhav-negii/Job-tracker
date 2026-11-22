@@ -117,7 +117,7 @@ app.patch('/api/application/:id',async(req,res)=>{
     return res.status(200).json(updatedApplication);
 }catch(error){
     if(error.code==="P2025"){
-        return res.status(404).json("Application not found");
+        return res.status(404).json({error : "Application not found"});
     
     }
     console.error("application cannot be updated",error);
